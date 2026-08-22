@@ -156,7 +156,7 @@ app.post("/api/incidents", (req, res) => {
 // SERVER
 // ===============================
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`🚨 CrisisGrid API running on http://localhost:${PORT}`);
