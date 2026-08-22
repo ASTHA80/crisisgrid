@@ -17,8 +17,11 @@ function App() {
     people: "10",
   });
 
-  // LOAD INCIDENTS FROM SQLITE
-  const fetchIncidents = async () => {
+  useEffect(() => {
+    fetchIncidents();
+  }, []);
+
+  async function fetchIncidents() {
     try {
       const response = await fetch(`${API_URL}/api/incidents`);
 
@@ -29,33 +32,27 @@ function App() {
       const data = await response.json();
       setIncidents(data);
     } catch (err) {
-      console.error("Incident loading error:", err);
+      console.error("Could not load incidents:", err);
     }
-  };
+  }
 
-  useEffect(() => {
-    fetchIncidents();
-  }, []);
-
-  // FORM INPUT
-  const handleChange = (e) => {
+  function handleChange(e) {
     const { name, value } = e.target;
 
     setIncident((prev) => ({
       ...prev,
       [name]: value,
     }));
-  };
+  }
 
-  // SUBMIT INCIDENT
-  const handleAnalyze = async () => {
+  async function handleAnalyze() {
     if (!incident.description.trim()) {
       setError("Please describe the incident first.");
       return;
     }
 
-    setLoading(true);
     setError("");
+    setLoading(true);
 
     try {
       const response = await fetch(`${API_URL}/api/incidents`, {
@@ -67,44 +64,43 @@ function App() {
       });
 
       if (!response.ok) {
-        throw new Error("Backend returned an error");
+        throw new Error("Backend error");
       }
 
       const data = await response.json();
 
-      console.log("CrisisGrid response:", data);
+      console.log("Backend response:", data);
+
+      await fetchIncidents();
 
       setShowAnalysis(true);
-
-      // Reload incidents from SQLite
-      await fetchIncidents();
     } catch (err) {
       console.error(err);
 
       setError(
-        "Could not connect to CrisisGrid server. Make sure backend is running on port 5000."
+        "Backend connection failed. Make sure server.js is running on port 5000."
       );
     } finally {
       setLoading(false);
     }
-  };
+  }
 
-  const openReport = () => {
+  function openReport() {
     setShowReport(true);
     setShowAnalysis(false);
     setError("");
-  };
+  }
 
-  const closeReport = () => {
+  function closeReport() {
     setShowReport(false);
     setShowAnalysis(false);
     setError("");
-  };
+  }
 
-  const dispatchResponse = () => {
-    alert("🚨 Response plan dispatched successfully!");
+  function dispatchResponse() {
+    alert("Response plan dispatched successfully!");
     closeReport();
-  };
+  }
 
   const criticalCount = incidents.filter(
     (item) => item.severity === "CRITICAL"
@@ -118,7 +114,7 @@ function App() {
     incidents.length > 0
       ? Math.round(
           incidents.reduce(
-            (sum, item) => sum + Number(item.risk_score || 0),
+            (total, item) => total + Number(item.risk_score || 0),
             0
           ) / incidents.length
         )
@@ -127,10 +123,7 @@ function App() {
   return (
     <div className="app">
 
-      {/* NAVBAR */}
-
       <nav className="navbar">
-
         <div className="logo">
           <span>✦</span>
           CrisisGrid
@@ -140,32 +133,22 @@ function App() {
           <span className="status-dot"></span>
           SYSTEM ONLINE
         </div>
-
       </nav>
-
-      {/* DASHBOARD */}
 
       <main className="dashboard">
 
-        {/* HEADER */}
-
         <div className="page-header">
-
           <div>
-
             <p className="eyebrow">
               EMERGENCY RESPONSE COMMAND CENTER
             </p>
 
-            <h1>
-              Situation Overview
-            </h1>
+            <h1>Situation Overview</h1>
 
             <p className="subtitle">
               AI-powered incident detection, prioritization
               and resource coordination.
             </p>
-
           </div>
 
           <button
@@ -174,126 +157,72 @@ function App() {
           >
             + Report Incident
           </button>
-
         </div>
-
-        {/* STATS */}
 
         <section className="stats-grid">
 
           <div className="stat-card critical">
-
-            <p>
-              CRITICAL INCIDENTS
-            </p>
-
+            <p>CRITICAL INCIDENTS</p>
             <h2>
               {String(criticalCount).padStart(2, "0")}
             </h2>
-
-            <span>
-              AI-prioritized emergencies
-            </span>
-
+            <span>AI-prioritized emergencies</span>
           </div>
 
           <div className="stat-card">
-
-            <p>
-              ACTIVE INCIDENTS
-            </p>
-
+            <p>ACTIVE INCIDENTS</p>
             <h2>
               {String(incidents.length).padStart(2, "0")}
             </h2>
-
-            <span>
-              Currently monitored
-            </span>
-
+            <span>Currently monitored</span>
           </div>
 
           <div className="stat-card">
-
-            <p>
-              HIGH PRIORITY
-            </p>
-
+            <p>HIGH PRIORITY</p>
             <h2>
               {String(highCount).padStart(2, "0")}
             </h2>
-
-            <span>
-              Requiring attention
-            </span>
-
+            <span>Requiring attention</span>
           </div>
 
           <div className="stat-card">
-
-            <p>
-              AVG RISK SCORE
-            </p>
-
-            <h2>
-              {averageRisk}
-            </h2>
-
-            <span>
-              AI assessment
-            </span>
-
+            <p>AVG RISK SCORE</p>
+            <h2>{averageRisk}</h2>
+            <span>AI assessment</span>
           </div>
 
         </section>
 
-        {/* MAIN CONTENT */}
-
         <section className="content-grid">
-
-          {/* MAP */}
 
           <div className="map-panel">
 
             <div className="panel-header">
-
               <div>
-
-                <h3>
-                  Live Incident Map
-                </h3>
-
-                <p>
-                  Real-time emergency activity
-                </p>
-
+                <h3>Live Incident Map</h3>
+                <p>Real-time emergency activity</p>
               </div>
 
               <span className="live-badge">
                 ● LIVE
               </span>
-
             </div>
 
             <div className="map">
 
               <div className="map-grid"></div>
 
-              {/* DYNAMIC MARKERS */}
-
-              {incidents.slice(0, 6).map((item, index) => (
-
-                <div
-                  key={item.id}
-                  className={`incident-marker marker-${(index % 3) + 1}`}
-                  title={`${item.type} - ${item.location}`}
-                >
-                  !
-                </div>
-
-              ))}
-
-              {incidents.length === 0 && (
+              {incidents.length > 0 ? (
+                incidents.slice(0, 3).map((item, index) => (
+                  <div
+                    key={item.id}
+                    className={`incident-marker marker-${index + 1}`}
+                    title={`${item.type} - ${item.location}`}
+                  >
+                    !
+                  </div>
+                ))
+              ) : (
                 <>
                   <div className="incident-marker marker-1">
                     !
@@ -322,37 +251,24 @@ function App() {
               </div>
 
             </div>
-
           </div>
-
-          {/* INCIDENT LIST */}
 
           <div className="incident-panel">
 
             <div className="panel-header">
-
               <div>
-
-                <h3>
-                  Priority Incidents
-                </h3>
-
-                <p>
-                  Live data from CrisisGrid
-                </p>
-
+                <h3>Priority Incidents</h3>
+                <p>Live data from CrisisGrid</p>
               </div>
 
               <span className="count">
                 {incidents.length}
               </span>
-
             </div>
 
             <div className="incident-list">
 
               {incidents.length === 0 ? (
-
                 <div
                   style={{
                     padding: "30px",
@@ -362,11 +278,8 @@ function App() {
                 >
                   No incidents reported yet.
                 </div>
-
               ) : (
-
-                incidents.slice(0, 6).map((item) => (
-
+                incidents.slice(0, 5).map((item) => (
                   <div
                     className="incident"
                     key={item.id}
@@ -383,7 +296,6 @@ function App() {
                     </div>
 
                     <div className="incident-info">
-
                       <strong>
                         {item.type}
                       </strong>
@@ -391,7 +303,6 @@ function App() {
                       <span>
                         {item.location}
                       </span>
-
                     </div>
 
                     <b>
@@ -399,18 +310,13 @@ function App() {
                     </b>
 
                   </div>
-
                 ))
-
               )}
 
             </div>
-
           </div>
 
         </section>
-
-        {/* AI RESPONSE */}
 
         <section className="ai-panel">
 
@@ -419,7 +325,6 @@ function App() {
           </div>
 
           <div>
-
             <p className="eyebrow">
               AI RESPONSE ENGINE
             </p>
@@ -430,10 +335,9 @@ function App() {
 
             <p>
               CrisisGrid analyzes incoming incidents,
-              calculates risk and recommends response
-              actions for emergency teams.
+              calculates risk and recommends emergency
+              response actions.
             </p>
-
           </div>
 
           <button className="action-btn">
@@ -444,10 +348,7 @@ function App() {
 
       </main>
 
-      {/* REPORT MODAL */}
-
       {showReport && (
-
         <div className="modal-overlay">
 
           <div className="modal">
@@ -455,7 +356,6 @@ function App() {
             <div className="modal-header">
 
               <div>
-
                 <p className="eyebrow">
                   NEW EMERGENCY REPORT
                 </p>
@@ -463,7 +363,6 @@ function App() {
                 <h2>
                   Report Incident
                 </h2>
-
               </div>
 
               <button
@@ -475,8 +374,6 @@ function App() {
 
             </div>
 
-            {/* TYPE */}
-
             <label htmlFor="type">
               Incident Type
             </label>
@@ -487,38 +384,14 @@ function App() {
               value={incident.type}
               onChange={handleChange}
             >
-
-              <option>
-                Industrial Fire
-              </option>
-
-              <option>
-                Building Collapse
-              </option>
-
-              <option>
-                Flood
-              </option>
-
-              <option>
-                Road Accident
-              </option>
-
-              <option>
-                Medical Emergency
-              </option>
-
-              <option>
-                Chemical Leak
-              </option>
-
-              <option>
-                Other
-              </option>
-
+              <option>Industrial Fire</option>
+              <option>Building Collapse</option>
+              <option>Flood</option>
+              <option>Road Accident</option>
+              <option>Medical Emergency</option>
+              <option>Chemical Leak</option>
+              <option>Other</option>
             </select>
-
-            {/* LOCATION */}
 
             <label htmlFor="location">
               Location
@@ -532,8 +405,6 @@ function App() {
               placeholder="Enter location"
             />
 
-            {/* PEOPLE */}
-
             <label htmlFor="people">
               People Affected
             </label>
@@ -545,10 +416,7 @@ function App() {
               min="0"
               value={incident.people}
               onChange={handleChange}
-              placeholder="Number of people"
             />
-
-            {/* DESCRIPTION */}
 
             <label htmlFor="description">
               Incident Description
@@ -563,10 +431,7 @@ function App() {
               rows="5"
             />
 
-            {/* ERROR */}
-
             {error && (
-
               <div
                 style={{
                   marginTop: "12px",
@@ -580,112 +445,60 @@ function App() {
               >
                 {error}
               </div>
-
             )}
-
-            {/* ANALYZE */}
 
             <button
               className="analyze-btn"
               onClick={handleAnalyze}
               disabled={loading}
             >
-
               {loading
                 ? "Analyzing..."
                 : "✦ Analyze With AI"}
-
             </button>
 
-            {/* ANALYSIS */}
-
             {showAnalysis && (
-
               <div className="analysis-result">
 
                 <div className="analysis-title">
-
-                  <span>
-                    ✦
-                  </span>
-
+                  <span>✦</span>
                   AI INCIDENT ANALYSIS
-
                 </div>
 
                 <div className="analysis-grid">
 
                   <div>
-
-                    <small>
-                      CLASSIFICATION
-                    </small>
-
-                    <strong>
-                      {incident.type}
-                    </strong>
-
+                    <small>CLASSIFICATION</small>
+                    <strong>{incident.type}</strong>
                   </div>
 
                   <div>
-
-                    <small>
-                      SEVERITY
-                    </small>
-
+                    <small>SEVERITY</small>
                     <strong className="danger">
                       CRITICAL
                     </strong>
-
                   </div>
 
                   <div>
-
-                    <small>
-                      RISK SCORE
-                    </small>
-
-                    <strong>
-                      94 / 100
-                    </strong>
-
+                    <small>RISK SCORE</small>
+                    <strong>94 / 100</strong>
                   </div>
 
                   <div>
-
-                    <small>
-                      PEOPLE AFFECTED
-                    </small>
-
-                    <strong>
-                      {incident.people}
-                    </strong>
-
+                    <small>PEOPLE AFFECTED</small>
+                    <strong>{incident.people}</strong>
                   </div>
 
                 </div>
 
                 <div className="recommendation">
 
-                  <small>
-                    AI RECOMMENDATION
-                  </small>
+                  <small>AI RECOMMENDATION</small>
 
-                  <p>
-                    🚒 Deploy 2 Fire Units
-                  </p>
-
-                  <p>
-                    🚑 Dispatch 1 Ambulance
-                  </p>
-
-                  <p>
-                    🏥 Alert nearest hospital
-                  </p>
-
-                  <p>
-                    🚨 Establish emergency perimeter
-                  </p>
+                  <p>🚒 Deploy 2 Fire Units</p>
+                  <p>🚑 Dispatch 1 Ambulance</p>
+                  <p>🏥 Alert nearest hospital</p>
+                  <p>🚨 Establish emergency perimeter</p>
 
                 </div>
 
@@ -697,13 +510,10 @@ function App() {
                 </button>
 
               </div>
-
             )}
 
           </div>
-
         </div>
-
       )}
 
     </div>
