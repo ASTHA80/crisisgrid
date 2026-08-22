@@ -1,6 +1,5 @@
-```css id="1d0w0q"
 /* =========================================================
-   CRISISGRID — GLOW + SMOOTH ANIMATIONS
+   CRISISGRID — ANIMATIONS + BORDER GLOW
 ========================================================= */
 
 /* =========================
@@ -8,29 +7,57 @@
 ========================= */
 
 * {
-  scroll-behavior: smooth;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    background-color 0.25s ease;
 }
 
 button,
-input,
-textarea,
-select,
+.incident-marker,
 .stat-card,
 .map-panel,
 .incident-panel,
 .ai-panel,
-.report-btn,
-.action-btn,
-.analyze-btn,
-.dispatch-btn,
-.close-btn {
-  transition:
-    transform 0.25s ease,
-    border-color 0.25s ease,
-    box-shadow 0.25s ease,
-    background 0.25s ease,
-    color 0.25s ease,
-    opacity 0.25s ease;
+.modal {
+  will-change: transform;
+}
+
+
+/* =========================
+   PAGE ENTRANCE
+========================= */
+
+.dashboard {
+  animation: dashboardIn 0.7s ease-out both;
+}
+
+.navbar {
+  animation: navIn 0.5s ease-out both;
+}
+
+@keyframes dashboardIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes navIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 
@@ -40,109 +67,413 @@ select,
 
 .navbar {
   box-shadow:
-    0 1px 0 rgba(255, 65, 65, 0.05),
-    0 8px 30px rgba(0, 0, 0, 0.25);
+    0 1px 0 rgba(255, 65, 65, 0.08),
+    0 8px 35px rgba(0, 0, 0, 0.25);
 }
 
-.logo {
-  transition:
-    text-shadow 0.3s ease,
-    transform 0.3s ease;
+.navbar::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 65, 65, 0.5),
+    transparent
+  );
+
+  animation: navbarScan 4s ease-in-out infinite;
 }
 
-.logo:hover {
-  transform: translateY(-1px);
-  text-shadow:
-    0 0 15px rgba(255, 255, 255, 0.12);
-}
-
-.logo span {
-  animation: logoGlow 2.5s ease-in-out infinite;
-}
-
-@keyframes logoGlow {
-  0%,
-  100% {
-    text-shadow: 0 0 12px rgba(255, 66, 66, 0.45);
+@keyframes navbarScan {
+  0% {
+    opacity: 0;
+    transform: scaleX(0.2);
   }
 
   50% {
-    text-shadow:
-      0 0 10px rgba(255, 66, 66, 0.8),
-      0 0 25px rgba(255, 66, 66, 0.35);
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scaleX(0.2);
   }
 }
 
 
 /* =========================
-   SYSTEM ONLINE GLOW
+   LOGO GLOW
+========================= */
+
+.logo span {
+  animation: logoPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes logoPulse {
+  0%,
+  100% {
+    text-shadow: 0 0 10px rgba(255, 66, 66, 0.45);
+  }
+
+  50% {
+    text-shadow:
+      0 0 8px rgba(255, 66, 66, 0.8),
+      0 0 25px rgba(255, 66, 66, 0.5);
+  }
+}
+
+
+/* =========================
+   LIVE STATUS
 ========================= */
 
 .status-dot {
-  animation: statusPulse 2s ease-in-out infinite;
+  animation: statusPulse 1.8s ease-in-out infinite;
 }
 
 @keyframes statusPulse {
   0%,
   100% {
-    opacity: 1;
-    box-shadow:
-      0 0 6px #32e875,
-      0 0 14px rgba(50, 232, 117, 0.35);
+    transform: scale(1);
+    opacity: 0.8;
   }
 
   50% {
-    opacity: 0.75;
+    transform: scale(1.35);
+    opacity: 1;
     box-shadow:
-      0 0 10px #32e875,
-      0 0 24px rgba(50, 232, 117, 0.6);
+      0 0 8px #32e875,
+      0 0 25px rgba(50, 232, 117, 0.7);
   }
 }
 
 
 /* =========================
-   PAGE HEADER
+   STAT CARDS
 ========================= */
 
-.page-header h1 {
-  animation: titleReveal 0.7s ease-out both;
+.stat-card {
+  position: relative;
+  overflow: hidden;
 }
 
-.page-header .eyebrow {
-  animation: fadeUp 0.5s ease-out both;
+.stat-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(
+    120deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.035),
+    transparent 80%
+  );
+
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
 }
 
-.page-header .subtitle {
-  animation: fadeUp 0.7s 0.08s ease-out both;
+.stat-card:hover::before {
+  transform: translateX(100%);
 }
 
-@keyframes titleReveal {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
+.stat-card:hover {
+  transform: translateY(-4px);
+
+  border-color: rgba(255, 65, 65, 0.35);
+
+  box-shadow:
+    0 10px 35px rgba(0, 0, 0, 0.35),
+    0 0 22px rgba(255, 65, 65, 0.08);
+}
+
+
+/* =========================
+   CRITICAL CARD
+========================= */
+
+.stat-card.critical {
+  animation: criticalGlow 3s ease-in-out infinite;
+}
+
+@keyframes criticalGlow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 rgba(255, 65, 65, 0),
+      inset 0 0 0 rgba(255, 65, 65, 0);
   }
 
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  50% {
+    box-shadow:
+      0 0 25px rgba(255, 65, 65, 0.08),
+      inset 0 0 20px rgba(255, 65, 65, 0.025);
   }
 }
 
 
 /* =========================
-   REPORT BUTTON
+   PANELS — BORDER GLOW
+========================= */
+
+.map-panel,
+.incident-panel,
+.ai-panel {
+  position: relative;
+  transition:
+    transform 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.map-panel:hover,
+.incident-panel:hover {
+  transform: translateY(-3px);
+
+  border-color: rgba(255, 65, 65, 0.28);
+
+  box-shadow:
+    0 15px 45px rgba(0, 0, 0, 0.3),
+    0 0 25px rgba(255, 65, 65, 0.06);
+}
+
+
+/* =========================
+   PANEL HEADER LINE
+========================= */
+
+.panel-header {
+  position: relative;
+}
+
+.panel-header::after {
+  content: "";
+
+  position: absolute;
+  bottom: 0;
+  left: 20px;
+  right: 20px;
+
+  height: 1px;
+
+  background: linear-gradient(
+    90deg,
+    rgba(255, 65, 65, 0.35),
+    transparent
+  );
+
+  opacity: 0.5;
+}
+
+
+/* =========================
+   MAP SCAN EFFECT
+========================= */
+
+.map {
+  position: relative;
+}
+
+.map::before {
+  content: "";
+
+  position: absolute;
+  left: 0;
+  right: 0;
+
+  height: 70px;
+
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(255, 65, 65, 0.055),
+    transparent
+  );
+
+  z-index: 2;
+  pointer-events: none;
+
+  animation: mapScan 4s linear infinite;
+}
+
+@keyframes mapScan {
+  0% {
+    top: -80px;
+  }
+
+  100% {
+    top: 100%;
+  }
+}
+
+
+/* =========================
+   MAP GRID ANIMATION
+========================= */
+
+.map-grid {
+  animation: gridMove 15s linear infinite;
+}
+
+@keyframes gridMove {
+  from {
+    transform: rotate(-7deg) scale(1.2) translate(0, 0);
+  }
+
+  to {
+    transform: rotate(-7deg) scale(1.2) translate(45px, 45px);
+  }
+}
+
+
+/* =========================
+   INCIDENT MARKERS
+========================= */
+
+.incident-marker {
+  cursor: pointer;
+}
+
+.incident-marker:hover {
+  transform: scale(1.18);
+
+  box-shadow:
+    0 0 0 10px rgba(255, 65, 65, 0.08),
+    0 0 35px rgba(255, 65, 65, 0.65);
+}
+
+
+/* =========================
+   INCIDENT LIST ANIMATION
+========================= */
+
+.incident {
+  transition:
+    transform 0.25s ease,
+    padding-left 0.25s ease,
+    background 0.25s ease;
+}
+
+.incident:hover {
+  padding-left: 8px;
+  background: rgba(255, 65, 65, 0.025);
+}
+
+.incident:hover .severity {
+  box-shadow: 0 0 12px currentColor;
+}
+
+.incident-list .incident {
+  animation: incidentIn 0.5s ease both;
+}
+
+.incident-list .incident:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.incident-list .incident:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.incident-list .incident:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.incident-list .incident:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+@keyframes incidentIn {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+
+/* =========================
+   LIVE BADGE
+========================= */
+
+.live-badge {
+  animation: liveGlow 2s ease-in-out infinite;
+}
+
+@keyframes liveGlow {
+  0%,
+  100% {
+    opacity: 0.75;
+    text-shadow: 0 0 5px rgba(53, 232, 123, 0.25);
+  }
+
+  50% {
+    opacity: 1;
+    text-shadow:
+      0 0 8px rgba(53, 232, 123, 0.7),
+      0 0 20px rgba(53, 232, 123, 0.35);
+  }
+}
+
+
+/* =========================
+   AI PANEL
+========================= */
+
+.ai-panel {
+  animation: aiBorderGlow 3s ease-in-out infinite;
+}
+
+@keyframes aiBorderGlow {
+  0%,
+  100% {
+    border-color: rgba(255, 65, 65, 0.2);
+  }
+
+  50% {
+    border-color: rgba(255, 65, 65, 0.5);
+
+    box-shadow:
+      0 0 25px rgba(255, 65, 65, 0.07),
+      inset 0 0 20px rgba(255, 65, 65, 0.02);
+  }
+}
+
+
+/* =========================
+   AI ICON
+========================= */
+
+.ai-icon {
+  animation: aiIconPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes aiIconPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(255, 65, 65, 0);
+  }
+
+  50% {
+    box-shadow:
+      0 0 20px rgba(255, 65, 65, 0.15),
+      inset 0 0 15px rgba(255, 65, 65, 0.05);
+  }
+}
+
+
+/* =========================
+   BUTTON GLOW
 ========================= */
 
 .report-btn,
@@ -156,18 +487,23 @@ select,
 .analyze-btn::before,
 .dispatch-btn::before {
   content: "";
+
   position: absolute;
   top: 0;
   left: -120%;
+
   width: 70%;
   height: 100%;
+
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.16),
+    rgba(255, 255, 255, 0.18),
     transparent
   );
+
   transform: skewX(-20deg);
+
   transition: left 0.6s ease;
 }
 
@@ -181,175 +517,16 @@ select,
 .analyze-btn:hover,
 .dispatch-btn:hover {
   transform: translateY(-3px);
+
   box-shadow:
-    0 10px 30px rgba(255, 65, 65, 0.25),
-    0 0 18px rgba(255, 65, 65, 0.12);
+    0 10px 30px rgba(255, 65, 65, 0.3),
+    0 0 18px rgba(255, 65, 65, 0.15);
 }
 
 .report-btn:active,
 .analyze-btn:active,
 .dispatch-btn:active {
-  transform: translateY(-1px) scale(0.98);
-}
-
-
-/* =========================
-   STAT CARDS — GLOW
-========================= */
-
-.stat-card {
-  position: relative;
-  overflow: hidden;
-}
-
-.stat-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  border: 1px solid transparent;
-  pointer-events: none;
-  transition:
-    border-color 0.3s ease,
-    box-shadow 0.3s ease;
-}
-
-.stat-card:hover {
-  transform: translateY(-5px);
-  border-color: rgba(130, 145, 170, 0.28);
-  box-shadow:
-    0 12px 35px rgba(0, 0, 0, 0.35),
-    0 0 20px rgba(80, 95, 120, 0.07);
-}
-
-.stat-card:hover::before {
-  border-color: rgba(255, 255, 255, 0.06);
-}
-
-.stat-card.critical:hover {
-  border-color: rgba(255, 65, 65, 0.65);
-  box-shadow:
-    0 12px 35px rgba(0, 0, 0, 0.4),
-    0 0 25px rgba(255, 65, 65, 0.12);
-}
-
-
-/* =========================
-   PANELS — SUBTLE RED GLOW
-========================= */
-
-.map-panel,
-.incident-panel,
-.ai-panel {
-  transition:
-    transform 0.3s ease,
-    border-color 0.3s ease,
-    box-shadow 0.3s ease;
-}
-
-.map-panel:hover,
-.incident-panel:hover {
-  border-color: rgba(255, 65, 65, 0.25);
-  box-shadow:
-    0 15px 45px rgba(0, 0, 0, 0.3),
-    0 0 25px rgba(255, 65, 65, 0.05);
-}
-
-
-/* =========================
-   MAP GLOW
-========================= */
-
-.map {
-  transition:
-    border-color 0.3s ease,
-    box-shadow 0.3s ease;
-}
-
-.map:hover {
-  border-color: rgba(255, 65, 65, 0.28);
-  box-shadow:
-    inset 0 0 30px rgba(255, 65, 65, 0.025),
-    0 0 25px rgba(255, 65, 65, 0.05);
-}
-
-
-/* =========================
-   INCIDENT MARKERS
-========================= */
-
-.incident-marker {
-  transition:
-    transform 0.25s ease,
-    filter 0.25s ease;
-}
-
-.incident-marker:hover {
-  transform: scale(1.18);
-  filter: brightness(1.15);
-}
-
-
-/* =========================
-   INCIDENT ROW HOVER
-========================= */
-
-.incident {
-  transition:
-    padding-left 0.25s ease,
-    background 0.25s ease,
-    border-color 0.25s ease;
-  border-radius: 6px;
-}
-
-.incident:hover {
-  padding-left: 8px;
-  background: rgba(255, 255, 255, 0.025);
-  border-bottom-color: rgba(255, 65, 65, 0.18);
-}
-
-
-/* =========================
-   AI PANEL GLOW
-========================= */
-
-.ai-panel {
-  position: relative;
-  overflow: hidden;
-}
-
-.ai-panel::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  border-radius: inherit;
-  background: linear-gradient(
-    110deg,
-    rgba(255, 65, 65, 0.06),
-    transparent 35%,
-    transparent 70%,
-    rgba(255, 65, 65, 0.025)
-  );
-}
-
-.ai-panel:hover {
-  border-color: rgba(255, 65, 65, 0.5);
-  box-shadow:
-    0 15px 45px rgba(0, 0, 0, 0.3),
-    0 0 30px rgba(255, 65, 65, 0.07);
-}
-
-.ai-icon {
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
-}
-
-.ai-panel:hover .ai-icon {
-  transform: scale(1.06);
-  box-shadow:
-    0 0 20px rgba(255, 65, 65, 0.12);
+  transform: translateY(0) scale(0.98);
 }
 
 
@@ -358,12 +535,43 @@ select,
 ========================= */
 
 .action-btn:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255, 65, 65, 0.4);
-  color: #ffffff;
+  border-color: rgba(255, 65, 65, 0.45);
+
   box-shadow:
-    0 8px 25px rgba(0, 0, 0, 0.25),
-    0 0 15px rgba(255, 65, 65, 0.07);
+    0 0 18px rgba(255, 65, 65, 0.1),
+    inset 0 0 12px rgba(255, 65, 65, 0.03);
+}
+
+
+/* =========================
+   FORM INPUT GLOW
+========================= */
+
+.modal input,
+.modal textarea,
+.modal select {
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.2s ease;
+}
+
+.modal input:hover,
+.modal textarea:hover,
+.modal select:hover {
+  border-color: #394251;
+}
+
+.modal input:focus,
+.modal textarea:focus,
+.modal select:focus {
+  transform: translateY(-1px);
+
+  border-color: rgba(255, 65, 65, 0.8);
+
+  box-shadow:
+    0 0 0 3px rgba(255, 65, 65, 0.07),
+    0 0 22px rgba(255, 65, 65, 0.08);
 }
 
 
@@ -372,14 +580,14 @@ select,
 ========================= */
 
 .modal-overlay {
-  animation: overlayFade 0.25s ease-out;
+  animation: overlayIn 0.25s ease both;
 }
 
 .modal {
-  animation: modalEnter 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation: modalIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-@keyframes overlayFade {
+@keyframes overlayIn {
   from {
     opacity: 0;
   }
@@ -389,10 +597,10 @@ select,
   }
 }
 
-@keyframes modalEnter {
+@keyframes modalIn {
   from {
     opacity: 0;
-    transform: translateY(20px) scale(0.97);
+    transform: translateY(25px) scale(0.96);
   }
 
   to {
@@ -403,48 +611,17 @@ select,
 
 
 /* =========================
-   INPUT GLOW
-========================= */
-
-.modal input:hover,
-.modal textarea:hover,
-.modal select:hover {
-  border-color: #3a4351;
-}
-
-.modal input:focus,
-.modal textarea:focus,
-.modal select:focus {
-  border-color: rgba(255, 65, 65, 0.75);
-  box-shadow:
-    0 0 0 3px rgba(255, 65, 65, 0.08),
-    0 0 18px rgba(255, 65, 65, 0.06);
-}
-
-
-/* =========================
-   CLOSE BUTTON
-========================= */
-
-.close-btn:hover {
-  transform: rotate(4deg);
-  border-color: rgba(255, 65, 65, 0.4);
-  box-shadow: 0 0 15px rgba(255, 65, 65, 0.08);
-}
-
-
-/* =========================
    ANALYSIS RESULT
 ========================= */
 
 .analysis-result {
-  animation: analysisReveal 0.4s ease-out;
+  animation: analysisIn 0.45s ease-out both;
 }
 
-@keyframes analysisReveal {
+@keyframes analysisIn {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(10px);
   }
 
   to {
@@ -461,9 +638,13 @@ select,
 }
 
 .analysis-grid > div:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255, 65, 65, 0.22);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  transform: translateY(-3px);
+
+  border-color: rgba(255, 65, 65, 0.3);
+
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.25),
+    0 0 15px rgba(255, 65, 65, 0.05);
 }
 
 
@@ -472,66 +653,78 @@ select,
 ========================= */
 
 .recommendation {
-  transition:
-    border-color 0.3s ease,
-    background 0.3s ease,
-    box-shadow 0.3s ease;
+  position: relative;
+
+  animation: recommendationPulse 3s ease-in-out infinite;
 }
 
-.recommendation:hover {
-  border-left-color: #ff5b5b;
-  background: rgba(255, 65, 65, 0.07);
-  box-shadow: inset 8px 0 25px rgba(255, 65, 65, 0.025);
-}
-
-
-/* =========================
-   LIVE BADGE
-========================= */
-
-.live-badge {
-  animation: liveTextGlow 2s ease-in-out infinite;
-}
-
-@keyframes liveTextGlow {
+@keyframes recommendationPulse {
   0%,
   100% {
-    opacity: 0.85;
-    text-shadow: 0 0 8px rgba(53, 232, 123, 0.35);
+    border-left-color: #ff4141;
   }
 
   50% {
-    opacity: 1;
-    text-shadow:
-      0 0 10px rgba(53, 232, 123, 0.65),
-      0 0 20px rgba(53, 232, 123, 0.25);
+    border-left-color: #ff7777;
+
+    box-shadow:
+      -4px 0 18px rgba(255, 65, 65, 0.08);
   }
 }
 
 
 /* =========================
-   RED BORDER ACCENT
+   CLOSE BUTTON
 ========================= */
 
-.content-grid > * {
-  position: relative;
+.close-btn {
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.content-grid > *::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 12%;
-  right: 12%;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 65, 65, 0.18),
-    transparent
-  );
-  opacity: 0.8;
-  pointer-events: none;
+.close-btn:hover {
+  transform: rotate(90deg);
+
+  border-color: rgba(255, 65, 65, 0.4);
+
+  box-shadow:
+    0 0 15px rgba(255, 65, 65, 0.1);
+}
+
+
+/* =========================
+   COUNT BADGE
+========================= */
+
+.count {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.count:hover {
+  transform: scale(1.05);
+
+  box-shadow:
+    0 0 12px rgba(255, 65, 65, 0.08);
+}
+
+
+/* =========================
+   SCROLLBAR GLOW
+========================= */
+
+::-webkit-scrollbar-thumb {
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ff4141;
+
+  box-shadow:
+    0 0 10px rgba(255, 65, 65, 0.5);
 }
 
 
@@ -546,7 +739,5 @@ select,
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
   }
 }
-```
